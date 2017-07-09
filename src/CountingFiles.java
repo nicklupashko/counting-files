@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-public class ConsoleApp {
+public class CountingFiles {
 
     public static void main(String[] args) throws InterruptedException {
         String inputFilePath = args[0];
