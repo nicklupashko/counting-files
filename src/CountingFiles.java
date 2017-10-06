@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 public class CountingFiles {
@@ -15,7 +16,8 @@ public class CountingFiles {
         String inputFilePath = args[0];
         String outputFilePath = args[1];
         List<String> pathsList = readLinesFromFile(inputFilePath);
-        List<CountTask> threads = new ArrayList<>(pathsList.size());
+        int processors = Runtime.getRuntime().availableProcessors();
+        List<CountTask> threads = new ArrayList<>(processors);
         ExecutorService executor = Executors.newCachedThreadPool();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             List<String> lines = new ArrayList<>();
@@ -35,7 +37,7 @@ public class CountingFiles {
 
     private static class CountTask extends Thread {
         String path;
-        long count = 0;
+        AtomicLong count = new AtomicLong(0);
 
         public CountTask(String path) {
             this.path = path;
@@ -50,7 +52,7 @@ public class CountingFiles {
             for (File file : new File(filePath).listFiles()) {
                 if (file.isDirectory()) {
                     getNumberOfFiles(file.getPath());
-                } else count++;
+                } else count.getAndAdd(1);
             }
         }
     }
